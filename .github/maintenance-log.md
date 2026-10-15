@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-10-15 — Restore ordered-dictionary lookup consistency
+
+- **Rationale:** `fromJSON()` replaced the ordered array without rebuilding the ID lookup map, leaving restored items inaccessible through `get()`, `update()`, and `remove()`. The related `update()` method also declared a boolean result but returned `false` after successful replacements.
+- **Files changed:** `lib/Store/make-ordered-dictionary.js`, `test/make-ordered-dictionary.test.js`, `.github/maintenance-log.md`
+- **Validation:** Ran `node --check` on the changed JavaScript files and `node --test test/make-ordered-dictionary.test.js` (2 tests passed). The regression tests cover removal of stale lookup entries, restoration of new lookups, order preservation, and accurate `update()` results. Reviewed the complete diff against the declaration contract and repository conventions.
+- **Risk:** Low. The change is isolated to the ordered dictionary's existing restoration and return-value behavior; it does not affect protocol, encryption, authentication, dependencies, or public method signatures.
+- **Rollback:** Revert the pull request's squash commit to restore the previous compiled utility and remove the focused regression test.
+
 ## 2026-10-10 — Document the repository's incomplete library status
 
 - **Rationale:** The previous README described a ready-to-run WhatsApp bot with a command handler and several application features, while the repository contains only a compiled Baileys library snapshot. It omitted the missing entry point, source, tests, build inputs, lockfile, and the dependency issue that prevents a clean runtime import.
