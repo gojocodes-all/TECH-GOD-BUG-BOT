@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-10-22 — Align the README with focused regression coverage
+
+- **Rationale:** The README still stated that the snapshot contained no tests after a focused Node.js regression test was added for the ordered-dictionary utility. That made the repository status, structure, and available validation guidance inaccurate.
+- **Files changed:** Updated `README.md` to describe the existing test, its exact direct command, its limited scope, and the remaining gap between one utility regression and a supported package test suite; updated this maintenance log.
+- **Validation:** Cross-checked the documented paths and commands against `package.json`, `test/make-ordered-dictionary.test.js`, the current repository tree, and the 2026-10-15 maintenance entry; ran the documented Node.js version guard, JavaScript syntax check, focused regression test, and Markdown consistency checks.
+- **Risk:** Low. Documentation only; compiled library code, package metadata, dependencies, protocol data, and runtime behavior are unchanged.
+- **Rollback:** Revert this pull request to restore the previous README wording and remove this log entry.
+
 ## 2026-10-15 — Restore ordered-dictionary lookup consistency
 
 - **Rationale:** `fromJSON()` replaced the ordered array without rebuilding the ID lookup map, leaving restored items inaccessible through `get()`, `update()`, and `remove()`. The related `update()` method also declared a boolean result but returned `false` after successful replacements.
