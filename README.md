@@ -10,8 +10,8 @@ bot**.
 The repository contains the compiled library under `lib/` and generated
 WhatsApp protocol definitions under `WAProto/`. It does not contain a bot
 entry point, command handler, configuration file, authentication-state setup,
-start script, original TypeScript source, tests, a TypeScript configuration, or
-a dependency lockfile.
+start script, original TypeScript source, a TypeScript configuration, a
+dependency lockfile, or a complete test suite.
 
 The package cannot currently be imported after a clean production dependency
 install. Its `libsignal` dependency resolves to
@@ -29,6 +29,8 @@ and validated.
 - Generated protocol definitions in `WAProto/index.js`
 - A Node.js version guard in `engine-requirements.js`
 - Package metadata and historical scripts in `package.json`
+- A focused built-in Node.js regression test for the ordered-dictionary utility
+  in `test/`
 
 The package metadata identifies the module as `@yumenative/baileys` version
 `2.0.3` and requires Node.js 20 or newer.
@@ -45,10 +47,12 @@ git clone https://github.com/gojocodes-all/TECH-GOD-BUG-BOT.git
 cd TECH-GOD-BUG-BOT
 node engine-requirements.js
 node --check lib/index.js
+node --test test/make-ordered-dictionary.test.js
 ```
 
-The final command checks JavaScript syntax only. It does not prove that the
-library can connect to WhatsApp.
+The syntax check and focused regression test validate only committed utility
+code. They do not prove that the library can be imported, connect to WhatsApp,
+or support a complete bot workflow.
 
 ### Dependency installation
 
@@ -80,7 +84,7 @@ the files currently committed:
 | `build:tsc` | Compile TypeScript | No source tree or `tsconfig.json` |
 | `build:docs` | Generate TypeDoc documentation | No TypeScript source or TypeDoc configuration |
 | `lint` | Lint `src/` | No `src/` directory |
-| `test` | Run Jest | No tests or Jest configuration |
+| `test` | Run Jest | No Jest configuration or restored source test suite; run the committed utility regression directly with `node --test test/make-ordered-dictionary.test.js` |
 | `gen:protobuf` | Regenerate protocol files | `WAProto/GenerateStatics.sh` is absent |
 
 There is no `start` script.
@@ -94,6 +98,8 @@ There is no `start` script.
 │   └── index.js            # Generated WhatsApp protocol definitions
 ├── engine-requirements.js  # Enforces Node.js 20+
 ├── package.json            # Package metadata and historical scripts
+├── test/
+│   └── make-ordered-dictionary.test.js  # Focused utility regression test
 └── README.md
 ```
 
@@ -103,8 +109,9 @@ There is no `start` script.
 2. Restore the original TypeScript source and build configuration, or clearly
    establish the compiled files as the maintained source of truth.
 3. Add a lockfile and reproducible installation process.
-4. Add focused tests for authentication, message parsing, reconnect behavior,
-   and credential persistence.
+4. Expand the current utility regression coverage into a supported test suite
+   for authentication, message parsing, reconnect behavior, and credential
+   persistence.
 5. Create a separate bot application with an explicit entry point, session
    storage, configuration, and command handling.
 6. Add CI that installs dependencies and runs the supported validation suite.
@@ -115,7 +122,9 @@ Keep changes narrow and document whether they target the library snapshot or a
 future bot application. Before opening a pull request:
 
 1. Confirm that every documented path and command exists.
-2. Run `node --check` on changed JavaScript files.
+2. Run `node --check` on changed JavaScript files and run the focused
+   `node --test test/make-ordered-dictionary.test.js` command when its utility
+   or regression coverage changes.
 3. Do not commit WhatsApp credentials, session files, environment files, phone
    numbers, or private message data.
 4. Update `.github/maintenance-log.md` with the rationale, validation, risk,
