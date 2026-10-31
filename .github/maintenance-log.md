@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-10-31 — Support prototype-like ordered-dictionary IDs
+
+- **Rationale:** The ordered dictionary stored its string-key lookup table in a normal object. IDs such as `toString`, `constructor`, and `__proto__` therefore collided with inherited object properties, causing `upsert()` to skip valid items and `get()` to return prototype values instead of stored records.
+- **Files changed:** Replaced the inherited lookup object with a null-prototype dictionary in `lib/Store/make-ordered-dictionary.js`; expanded `test/make-ordered-dictionary.test.js`; updated this maintenance log.
+- **Validation:** Ran the Node.js version guard, syntax-checked all committed JavaScript, ran the focused Node.js test suite, reproduced the old collision behavior before the fix, and ran `git diff --check`.
+- **Risk:** Low. The change only removes inherited keys from the utility's private lookup table. Ordering, public methods, declarations, valid existing IDs, protocol code, encryption, authentication, and dependencies are unchanged.
+- **Rollback:** Revert this pull request to restore the normal-object lookup table and remove the focused regression.
+
 ## 2026-10-22 — Align the README with focused regression coverage
 
 - **Rationale:** The README still stated that the snapshot contained no tests after a focused Node.js regression test was added for the ordered-dictionary utility. That made the repository status, structure, and available validation guidance inaccurate.

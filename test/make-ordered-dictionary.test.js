@@ -27,3 +27,29 @@ test('update reports whether it replaced an item', () => {
     assert.deepEqual(dictionary.get('first'), { id: 'first', value: 2 });
     assert.equal(dictionary.update({ id: 'missing', value: 3 }), false);
 });
+
+test('supports IDs that match Object prototype property names', () => {
+    const dictionary = makeOrderedDictionary(item => item.id);
+    const items = ['toString', 'constructor', '__proto__'].map((id, index) => ({
+        id,
+        value: index + 1
+    }));
+
+    for (const item of items) {
+        dictionary.upsert(item, 'append');
+    }
+
+    assert.deepEqual(dictionary.array, items);
+    for (const item of items) {
+        assert.deepEqual(dictionary.get(item.id), item);
+    }
+
+    dictionary.clear();
+    dictionary.fromJSON(items);
+
+    for (const item of items) {
+        assert.deepEqual(dictionary.get(item.id), item);
+    }
+    assert.equal(dictionary.remove({ id: '__proto__' }), true);
+    assert.equal(dictionary.get('__proto__'), undefined);
+});
