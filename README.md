@@ -29,8 +29,8 @@ and validated.
 - Generated protocol definitions in `WAProto/index.js`
 - A Node.js version guard in `engine-requirements.js`
 - Package metadata and historical scripts in `package.json`
-- A focused built-in Node.js regression test for the ordered-dictionary utility
-  in `test/`
+- Dependency-free syntax validation and built-in Node.js regression tests
+- Read-only GitHub Actions validation for pull requests and `master`
 
 The package metadata identifies the module as `@yumenative/baileys` version
 `2.0.3` and requires Node.js 20 or newer.
@@ -45,14 +45,17 @@ Requirements:
 ```bash
 git clone https://github.com/gojocodes-all/TECH-GOD-BUG-BOT.git
 cd TECH-GOD-BUG-BOT
-node engine-requirements.js
-node --check lib/index.js
-node --test test/make-ordered-dictionary.test.js
+npm run validate
 ```
 
-The syntax check and focused regression test validate only committed utility
-code. They do not prove that the library can be imported, connect to WhatsApp,
-or support a complete bot workflow.
+The dependency-free validation gate enforces Node.js 20+, syntax-checks every
+committed JavaScript file, and runs the supported built-in tests. It does not
+install dependencies or prove that the library can be imported, connect to
+WhatsApp, or support a complete bot workflow.
+
+Use `npm run check:syntax` or `npm test` when only one part of that gate is
+needed. Pull requests and pushes to `master` run the same `npm run validate`
+command with read-only repository permissions.
 
 ### Dependency installation
 
@@ -84,7 +87,9 @@ the files currently committed:
 | `build:tsc` | Compile TypeScript | No source tree or `tsconfig.json` |
 | `build:docs` | Generate TypeDoc documentation | No TypeScript source or TypeDoc configuration |
 | `lint` | Lint `src/` | No `src/` directory |
-| `test` | Run Jest | No Jest configuration or restored source test suite; run the committed utility regression directly with `node --test test/make-ordered-dictionary.test.js` |
+| `check:syntax` | Syntax-check every committed JavaScript file | Does not load dependencies or exercise runtime behavior |
+| `test` | Run the supported built-in Node.js tests | Covers repository validation and the ordered-dictionary utility, not the full library |
+| `validate` | Run the shared Node.js guard, syntax, and test gate | Dependency-free by design while the runtime dependency is unresolved |
 | `gen:protobuf` | Regenerate protocol files | `WAProto/GenerateStatics.sh` is absent |
 
 There is no `start` script.
@@ -98,8 +103,12 @@ There is no `start` script.
 │   └── index.js            # Generated WhatsApp protocol definitions
 ├── engine-requirements.js  # Enforces Node.js 20+
 ├── package.json            # Package metadata and historical scripts
+├── scripts/
+│   └── validate.js         # Shared dependency-free validation entry point
 ├── test/
-│   └── make-ordered-dictionary.test.js  # Focused utility regression test
+│   ├── make-ordered-dictionary.test.js  # Focused utility regression test
+│   └── validate-repository.test.js      # Validation discovery and mode tests
+├── .github/workflows/ci.yml             # Read-only hosted validation
 └── README.md
 ```
 
@@ -114,7 +123,8 @@ There is no `start` script.
    persistence.
 5. Create a separate bot application with an explicit entry point, session
    storage, configuration, and command handling.
-6. Add CI that installs dependencies and runs the supported validation suite.
+6. After restoring the runtime dependency, extend CI with clean-install,
+   package-import, and integration coverage.
 
 ## Contributing
 
@@ -122,9 +132,8 @@ Keep changes narrow and document whether they target the library snapshot or a
 future bot application. Before opening a pull request:
 
 1. Confirm that every documented path and command exists.
-2. Run `node --check` on changed JavaScript files and run the focused
-   `node --test test/make-ordered-dictionary.test.js` command when its utility
-   or regression coverage changes.
+2. Run `npm run validate`, which checks every committed JavaScript file and all
+   currently supported Node.js tests without installing dependencies.
 3. Do not commit WhatsApp credentials, session files, environment files, phone
    numbers, or private message data.
 4. Update `.github/maintenance-log.md` with the rationale, validation, risk,

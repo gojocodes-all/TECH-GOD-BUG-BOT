@@ -1,5 +1,13 @@
 # Maintenance log
 
+## 2026-11-12 — Add one reproducible validation gate
+
+- **Rationale:** The repository had one working dependency-free regression test, but `npm test` still invoked unavailable Jest tooling, contributors had to remember several direct commands, and pull requests had no automated validation. A single Node.js entry point now enforces the supported runtime, checks every committed JavaScript file, and runs the supported tests locally and in read-only CI without pretending the unresolved runtime dependency is usable.
+- **Files changed:** Added `scripts/validate.js`, `test/validate-repository.test.js`, and `.github/workflows/ci.yml`; updated `package.json`, `README.md`, and this maintenance log.
+- **Validation:** Ran `npm run validate` on Node.js 20.19.6 and the local supported runtime, confirmed all 99 JavaScript files passed syntax checks and all 6 tests passed, exercised each package-script mode, parsed `package.json`, validated the workflow YAML, and ran `git diff --check`.
+- **Risk:** Low. The change affects only validation commands, tests, documentation, and a read-only workflow. It does not install dependencies in CI or change compiled library code, declarations, protocol data, encryption, authentication, networking, package exports, or runtime behavior.
+- **Rollback:** Revert this pull request's squash commit to restore the historical Jest script and remove the validation entry point, tests, workflow, documentation, and log entry. No runtime or data migration is involved.
+
 ## 2026-10-31 — Support prototype-like ordered-dictionary IDs
 
 - **Rationale:** The ordered dictionary stored its string-key lookup table in a normal object. IDs such as `toString`, `constructor`, and `__proto__` therefore collided with inherited object properties, causing `upsert()` to skip valid items and `get()` to return prototype values instead of stored records.
