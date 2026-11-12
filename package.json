@@ -31,6 +31,7 @@
         "build:tsc": "tsc",
         "changelog:last": "conventional-changelog -p angular -r 2",
         "changelog:preview": "conventional-changelog -p angular -u",
+        "check:syntax": "node scripts/validate.js --syntax-only",
         "gen:protobuf": "sh WAProto/GenerateStatics.sh",
         "lint": "eslint src --ext .js,.ts,.jsx,.tsx",
         "lint:fix": "eslint src --fix --ext .js,.ts,.jsx,.tsx",
@@ -38,7 +39,8 @@
         "prepare": "",
         "preinstall": "node ./engine-requirements.js",
         "release": "release-it",
-        "test": "jest"
+        "test": "node scripts/validate.js --tests-only",
+        "validate": "node scripts/validate.js"
     },
     "dependencies": {
         "@adiwajshing/keyed-db": "^0.2.4",
